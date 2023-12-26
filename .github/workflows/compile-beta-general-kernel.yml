@@ -17,7 +17,7 @@ on:
         type: choice
         options:
           - unifreq
-          - codesnas/linux-amlogic-6.6.y
+          - codesnas
       kernel_version:
         description: "Select kernel version"
         required: false
