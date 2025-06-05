@@ -1,10 +1,10 @@
 #==========================================================================
-# Description: Compile release general kernel
+# Description: Compile the mainline kernel using Docker
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/kernel
 #==========================================================================
 
-name: Compile release general kernel
+name: Compile the mainline kernel using Docker
 
 on:
   repository_dispatch:
@@ -24,16 +24,12 @@ on:
         default: "6.12.y"
         type: choice
         options:
-          - 5.4.y
           - 5.10.y
           - 5.15.y
           - 6.1.y
           - 6.6.y
           - 6.12.y
-          - 5.4.y_5.10.y
-          - 5.15.y_6.1.y
-          - 6.6.y_6.12.y
-          - 5.4.y_5.10.y_5.15.y
+          - 5.10.y_5.15.y
           - 6.1.y_6.6.y_6.12.y
           - all
       kernel_auto:

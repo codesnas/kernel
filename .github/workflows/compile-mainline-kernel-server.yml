@@ -1,10 +1,10 @@
 #==========================================================================
-# Description: Compile release rk35xx kernel
-# Copyright (C) 2023 https://github.com/unifreq/linux-5.10.y-rk35xx
-# Copyright (C) 2023 https://github.com/ophub/kernel
+# Description: Compile the mainline kernel on a server
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Compile release rk35xx kernel
+name: Compile the mainline kernel on a server
 
 on:
   repository_dispatch:
@@ -13,22 +13,29 @@ on:
       kernel_source:
         description: "Select the kernel source"
         required: false
-        default: "unifreq/linux-5.10.y-rk35xx"
+        default: "unifreq"
         type: choice
         options:
-          - unifreq/linux-5.10.y-rk35xx
-          - unifreq/linux-6.1.y-rockchip
-          - codesnas/linux-5.10.y-rk35xx
-          - codesnas/linux-6.1.y-rockchip
-          - armbian/linux-rockchip@rk-6.1-rkr5.1
+          - unifreq
+          - codesnas
       kernel_version:
         description: "Select kernel version"
         required: false
-        default: "5.10.y"
+        default: "5.4.y"
         type: choice
         options:
+          - 5.4.y
           - 5.10.y
+          - 5.15.y
           - 6.1.y
+          - 6.6.y
+          - 6.12.y
+          - 5.4.y_5.10.y
+          - 5.15.y_6.1.y
+          - 6.6.y_6.12.y
+          - 5.4.y_5.10.y_5.15.y
+          - 6.1.y_6.6.y_6.12.y
+          - all
       kernel_auto:
         description: "Auto use the latest kernel"
         required: false
@@ -58,6 +65,7 @@ on:
         default: "gcc"
         type: choice
         options:
+          - clang
           - gcc
           - gcc-14.2
       compress_format:
@@ -73,28 +81,11 @@ on:
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
-        default: "-rk35xx-ophub"
+        default: "-ophub"
         type: choice
         options:
-          - -rk35xx-ophub
-          - -happy-new-year
-          - -dragon-boat-festival
-          - -mid-autumn-festival
-          - -happy-national-day
-          - -merry-christmas
-          - -spring-plowing
-          - -summer-growing
-          - -autumn-harvesting
-          - -winter-storing
+          - -ophub
           - -yourname
-      kernel_config:
-        description: "Set the path of kernel .config"
-        required: false
-        default: "kernel-config/release/rk35xx"
-        type: choice
-        options:
-          - kernel-config/release/rk35xx
-          - false
 
 env:
   TZ: America/New_York
@@ -147,7 +138,7 @@ jobs:
           sudo mkdir -p /builder
           sudo mount /dev/github/runner /builder
           sudo chown -R runner.runner /builder
-          df -Th
+          df -hT
 
       - name: Create a mapped directory
         id: mapped
@@ -169,9 +160,8 @@ jobs:
           kernel_auto: ${{ inputs.kernel_auto }}
           delete_source: ${{ inputs.delete_source }}
           kernel_package: ${{ inputs.kernel_package }}
-          kernel_toolchain: ${{ inputs.kernel_toolchain }}
           kernel_sign: ${{ inputs.kernel_sign }}
-          kernel_config: ${{ inputs.kernel_config }}
+          kernel_toolchain: ${{ inputs.kernel_toolchain }}
           compress_format: ${{ inputs.compress_format }}
           silent_log: ${{ inputs.silent_log }}
 
@@ -179,13 +169,13 @@ jobs:
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
-          tag: kernel_rk35xx
+          tag: kernel_stable
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            - The kernel can be used to compile Armbian and OpenWrt.
-            - The kernel source code comes from: unifreq/linux-5.10.y-rk35xx
-            - The kernel compilation toolchain: gcc
-            - This is a dedicated kernel for `Rockchip rk3528/rk3566/rk3568` and is not compatible with other series.
-            - 这是 `Rockchip rk3528/rk3566/rk3568` 专用内核，和其他系列不通用。
+            The kernel can be used to compile Armbian and OpenWrt.
+            The kernel source code comes from: ${{ inputs.kernel_source }}
+            The kernel compilation toolchain: ${{ inputs.kernel_toolchain }}
