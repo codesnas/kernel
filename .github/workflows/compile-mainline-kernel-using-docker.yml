@@ -82,7 +82,6 @@ on:
         options:
           - trixie
           - bookworm
-          - bullseye
           - noble
           - jammy
       kernel_sign:
