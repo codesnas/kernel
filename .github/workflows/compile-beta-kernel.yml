@@ -225,7 +225,6 @@ jobs:
           ccache_clear: ${{ inputs.ccache_clear }}
           kernel_sign: -beta
           delete_source: true
-          silent_log: false
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
